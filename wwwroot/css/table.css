@@ -1,16 +1,16 @@
-﻿.historyTable
-{
+﻿.historyTable {
     width: 100%;
-    border:none;
+    border: none;
     text-align: center;
-    
+
 }
 
 .historyTableCell
 {
     height: 30px;
     vertical-align: center;
-    color: #323539;
+
+    color: white;
     border: #323539;
     border-style: solid;
     text-align: center;

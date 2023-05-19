@@ -24,28 +24,5 @@
 
 .Div2{
     padding-top: 15%;
-}
-
-.Table2 {
-    font-size: 20px;
-    width: 100%;
-    text-align: center;
-    line-height: 35px;
-}
-
-.ButtonFilter{
-    background-color: gray;
-    height: 45px;
-    width: 70px;
-    border-radius: 12px;
-    font-size:20px;
-    border:none;
-
-    position: absolute;
-    right: 30px;
-    bottom: 30px;
-}
-
-.Div3{
-
+    align-items: center;
 }

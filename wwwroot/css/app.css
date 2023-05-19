@@ -104,14 +104,10 @@ a, .btn-link {
     background-color: transparent;
     border:none;
     outline:none;
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid white;
     font-size:23px;
     max-width: 48%;
     color: #EBEBEB;
-}
-
-.labelHryvnia{
-    font-size:23px;
 }
 
 .inputType {
@@ -123,7 +119,7 @@ a, .btn-link {
     background-color: transparent;
     border: none;
     outline: none;
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid white;
     font-size: 23px;
     color: #EBEBEB;
 }
@@ -137,7 +133,7 @@ a, .btn-link {
     background-color: transparent;
     border: none;
     outline: none;
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid white;
     font-size: 23px;
     color: #EBEBEB;
 }
@@ -150,7 +146,7 @@ a, .btn-link {
     align-items: center;
     text-align: center;
     background-color: transparent;
-    border: 1px solid gray;
+    border: 1px solid white;
     border-radius: 10px;
     outline: none;
     font-size: 23px;

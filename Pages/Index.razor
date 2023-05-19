@@ -1,10 +1,17 @@
 ﻿@page "/"
+@using Finance_Manager.Data
+<lable>@error</lable>
+<div>
+    <input class="inputDate" style="width: 45%" @bind="@firstDate" max="@lastDate.ToString("yyyy-MM-dd")" type="date"/> - 
+    <input class="inputDate" style="width: 45%" @bind="@lastDate" type="date"/>
+    <input type="checkbox"/>
+</div>
 <div style="padding-top: 10%;">
     <div class="Balance">
         <label>Balance</label>
     </div>
     <div class ="Suma">
-        <label>Suma</label>
+        <label>@balance</label>
     </div>
   
 
@@ -14,27 +21,97 @@
                 Income
             </td>
             <td>
-                Spend
+                Spends
             </td>
         </tr>
         <tr>
             <td>
-                Vystavysh
+                @income
             </td>
             <td>
-                Vystavysh2
+                @(-spends)
             </td>
         </tr>
     </table>
 
     <div class="Div2">
-        <table class="Table2">
-            <tr>
-                <td style="width: 70%;">Type</td>
-                <td>Suma</td>
-            </tr>
-        </table>
+        <button class="@(isIncomeActive?"btn btn-info":"btn btn-light ")" style="width: 49%;" @onclick="OnClickIncome">Income</button>
+        <button class="@(isIncomeActive?"btn btn-light ":"btn btn-info")" style="width: 49%;" @onclick="OnClickSpends">Spends</button>
+        <ul class="list-group">
+            @{
+                if (incomeList == null || spendsList == null)
+                {
+                    <Label>Loading...</Label>
+                }
+                else
+                {
+                    foreach (var item in isIncomeActive?
+                        incomeList.Where(x=>x.Date <= lastDate && x.Date >= firstDate)
+                            .GroupBy(x => x.Type)
+                            .OrderByDescending(x=>x.Sum(x=>x.Amount)):
+                        spendsList.Where(x=>x.Date <= lastDate && x.Date >= firstDate)
+                            .GroupBy(x => x.Type)
+                            .OrderByDescending(x=>x.Sum(x=>x.Amount)))
+                    {
+                        <li class="list-group-item list-group-item list-group-item-action">
+                            @item.Key
+                            <label style="position: absolute;right: 5px">@item.Sum(x => x.Amount)</label>
+                        </li>
+                    }
+                }
+            }
+        </ul>
     </div>
-
-    <button class="ButtonFilter">Filter</button>
 </div>
+
+@code
+{
+    FinancialOperationsDatabase database= new FinancialOperationsDatabase();
+    decimal balance;
+    decimal income;
+    decimal spends;
+    string error;
+    bool isIncomeActive = true;
+    List<FinancialOperationItem> incomeList; 
+    List<FinancialOperationItem> spendsList;
+    DateTime firstDate;
+    DateTime lastDate;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            income = (await database.GetIncome()).Sum(x => x.Amount);
+            spends = (await database.GetSpends()).Sum(x => x.Amount);
+            balance = income - spends;
+            incomeList = await database.GetIncome();
+            spendsList = await database.GetSpends();
+            lastDate = DateTime.Today;
+            firstDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            error = "Помилка: " + ex.Message;
+        }
+    }
+
+    void OnClickIncome()
+    {
+        isIncomeActive = true;
+        
+        StateHasChanged();
+    }
+    void OnClickSpends()
+    {
+        isIncomeActive = false;
+        
+        StateHasChanged();
+    }
+
+    void OnClickListItem(string type, bool opType)
+    {
+        FilterService.Type = type;
+        FilterService.OperationType = opType;
+        
+    }
+}

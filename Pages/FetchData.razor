@@ -18,25 +18,53 @@
 <table class="historyTable">
     <thead>
     <tr>
-        <th class="historyTableCell" styles="width: 20% color:#EBEBEB">Amount</th>
-        <th class="historyTableCell" styles="width: 20% color:#EBEBEB">Type</th>
-        <th class="historyTableCell" styles="width: 40% color:#EBEBEB">Description</th>
-        <th class="historyTableCell" styles="width: 20% color:#EBEBEB">Date</th>
+        <th class="historyTableCell" styles="width: 20% color:#EBEBEB"></th>
+        <th class="historyTableCell" styles="width: 20% color:#EBEBEB"></th>
+        <th class="historyTableCell" styles="width: 40% color:#EBEBEB"></th>
         <th class="historyTableCell"></th>
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in FinancialOperationItems)
-    {
-        <tr style=@(item.OperationType ? "background-color: rgb(221,255,187)" : "background-color: rgb(255,180,180);border:none")>
-            <td class="historyTableCell">@(item.OperationType ? item.Amount : -item.Amount)</td>
-            <td class="historyTableCell">@item.Type</td>
-            <td class="historyTableCell">@item.Description</td>
-            <td class="historyTableCell">@item.Date.ToString("dd-MM-yyyy")</td>
-            <td style="background-color: #323539; border:none"><button @onclick="() => deleteRow(item.ID)" class="DeleteEditButton">🗑</button>
-                <button @onclick="() => editRow(item.ID)" class="DeleteEditButton">🖊️</button></td>
-        </tr>
-    }
+        @{
+            if(FinancialOperationItems.Count != 0)
+            {
+                var date = FinancialOperationItems.First().Date;
+
+                var str = date.Day.ToString("00") + "." + date.Month.ToString("00") + (date.Year == DateTime.Today.Year ? "" : (".") + date.Year);
+                <tr style="border: none;">
+                    <td class="historyTableCell"></td>
+                    <td class="historyTableCell" style="text-align:right">@str</td>
+                    <td class="historyTableCell"></td>
+                    <td class="historyTableCell"></td>
+                </tr>
+
+                foreach (var item in FinancialOperationItems)
+                {
+                    if(date != item.Date)
+                    {
+                        date = item.Date;
+                        str = date.Day.ToString("00") + "." + date.Month.ToString("00") + (date.Year == DateTime.Today.Year ? "" : (".") + date.Year);
+                        <tr style="border: none;">
+                            <td class="historyTableCell"></td>
+                            <td class="historyTableCell" style="text-align:right">@str</td>
+                            <td class="historyTableCell"></td>
+                            <td class="historyTableCell"></td>
+                        </tr>
+                    }
+                    <tr style="border: none;">
+                        <td class="historyTableCell" style=@(item.OperationType ? "background-color: rgb(0,120,0)" : "background-color: rgb(150,0,0);border:none")>@(item.OperationType ? item.Amount : -item.Amount)</td>
+                        <td class="historyTableCell" style="background-color: transparent;">@item.Type</td>
+                        <td class="historyTableCell">@item.Description</td>
+                        <td style="background-color: transparent; border:none">
+                            <button @onclick="() => deleteRow(item.ID)" class="DeleteEditButton">🗑</button>
+                            <button @onclick="() => editRow(item.ID)" class="DeleteEditButton">🖊️</button>
+                        </td>
+                    </tr>
+                }
+            }
+            
+        }
+    
     </tbody>
 </table>
 

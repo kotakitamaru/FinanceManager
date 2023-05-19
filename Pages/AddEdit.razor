@@ -6,7 +6,6 @@
 <div id="mainContainer" style="text-align:center; padding-top: 10%;">
     <div id="addLabelContainer" style="padding-bottom: 30px; text-align:center;">
         <label id="addLabel"  class="labelHryvnia" style="font-size: 30px;">@(AddEditService.Edit?"Edit":"Add")</label>
-        <label id="xdDebug"  class="labelHryvnia" style="font-size: 30px;"></label>
     </div>
      <div id="typeSelectContainer" style="padding-bottom: 40px; text-align:center;">
          <select @bind=@Value id="typeSelect" class="inputType">
@@ -32,7 +31,7 @@
         </select>
         </div>
     <div id="amountInputContainer" style="padding-bottom: 30px; text-align:center;">
-        <input id="amountInput" @bind="@amount" class="inputAmount" type="number" placeholder="Amount" />
+        <input id="amountInput" @bind="@amount" class="inputAmount" type="number" placeholder="Amount" step="0,01"/>
     </div>
     <div id="descriptionInputContainer" style="padding-bottom: 40px; text-align:center;">
         <textarea id="descriptionInput"  class="inputDescription" type="text" placeholder="Description" @bind="@description"></textarea>
@@ -54,8 +53,8 @@
 @code {
     [Parameter]
     public string Arg { get; set; }
-    
-    decimal amount = 0m;
+
+    decimal amount;
     string type = "Other";
     DateTime date = DateTime.Today;
     string description;
@@ -65,10 +64,15 @@
     
     async public void OnOKButtonClick()
     {
+        if (amount < 0.01m)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Amount must be greater than 0");
+            return;
+        }
         if (AddEditService.Edit == true)
         {
             FinancialOperationItem item = await database.GetItemAsync(AddEditService.id);
-            item.Amount = amount;
+            item.Amount = Math.Round(amount,2);
             item.Type = type;
             item.OperationType = (Value == "incomeType");
             item.Date = date;
@@ -79,7 +83,7 @@
         {
             await database.SaveItemAsync(new FinancialOperationItem
             {
-                Amount = amount,
+                Amount = Math.Round(amount,2),
                 Type = type,
                 OperationType = (Value == "incomeType"),
                 Date = date,
@@ -109,4 +113,13 @@
             error = e.Message;
         }
     }
+    // private void ValidateDecimal(ChangeEventArgs e)
+    // {
+    //     string inputValue = e.Value.ToString();
+    //     bool isValid = System.Text.RegularExpressions.Regex.IsMatch(inputValue, @"^\d+(\.\d{1,2})?$");
+    //     if (!isValid)
+    //     {
+    //         e.Value = ((double)e.Value).ToString("0.00");
+    //     }
+    // }
 }
