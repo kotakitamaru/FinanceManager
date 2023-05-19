@@ -5,9 +5,9 @@ Finance Manager is a user financial tracking service.
 
 ## Installation
 
-Use the apk file downloaded from [cloud service](https://) to install Finance Manager.
+Use the apk file downloaded from [cloud service](https://drive.google.com/file/d/1bUOEKtvf2eygHFAubcxYpjLqAW29uxrR/view) to install Finance Manager.
 
-[https://](https://)
+[Google Drive](https://drive.google.com/file/d/1bUOEKtvf2eygHFAubcxYpjLqAW29uxrR/view)
 
 ## About
 
