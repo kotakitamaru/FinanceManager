@@ -1,0 +1,109 @@
+﻿@page "/fetchdata"
+
+@using Finance_Manager.Data
+@inject NavigationManager NavigationManager
+
+<h1>Operations history</h1>
+
+<p>@error</p>
+<div style="text-align:right; margin-bottom: 5px;margin-right: 3px; color:#EBEBEB">
+    Sort by: <select class="inputType" style="font-size: medium" @onchange="SortList">
+        <option value="ByDateDescending" selected>By Date (z-a)</option>
+        <option value="ByDateAscending">By Date (a-z)</option>
+        <option value="ByValueDescending">By Amount (z-a)</option>
+        <option value="ByValueAscending">By Amount (a-z)</option>
+    </select>
+</div>
+
+<table class="historyTable">
+    <thead>
+    <tr>
+        <th class="historyTableCell" styles="width: 20% color:#EBEBEB">Amount</th>
+        <th class="historyTableCell" styles="width: 20% color:#EBEBEB">Type</th>
+        <th class="historyTableCell" styles="width: 40% color:#EBEBEB">Description</th>
+        <th class="historyTableCell" styles="width: 20% color:#EBEBEB">Date</th>
+        <th class="historyTableCell"></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in FinancialOperationItems)
+    {
+        <tr style=@(item.OperationType ? "background-color: rgb(221,255,187)" : "background-color: rgb(255,180,180);border:none")>
+            <td class="historyTableCell">@(item.OperationType ? item.Amount : -item.Amount)</td>
+            <td class="historyTableCell">@item.Type</td>
+            <td class="historyTableCell">@item.Description</td>
+            <td class="historyTableCell">@item.Date.ToString("dd-MM-yyyy")</td>
+            <td style="background-color: #323539; border:none"><button @onclick="() => deleteRow(item.ID)" class="DeleteEditButton">🗑</button>
+                <button @onclick="() => editRow(item.ID)" class="DeleteEditButton">🖊️</button></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<NavLink class="nav-link" href="addedit">
+        <button class="AddButton">+</button>
+    </NavLink>
+
+@code {
+    FinancialOperationsDatabase database = new FinancialOperationsDatabase();
+    List<FinancialOperationItem> FinancialOperationItems = new List<FinancialOperationItem>();
+    string error;
+    protected override async Task OnInitializedAsync()
+    {
+        AddEditService.Edit = false;
+        AddEditService.id = -1;
+        try
+        {
+            FinancialOperationItems = await database.GetTable();
+            FinancialOperationItems = FinancialOperationItems.OrderByDescending(x => x.Date).ToList();
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            error = "Помилка: " + ex.Message;
+        }
+    }
+
+    async public void deleteRow(int id)
+    {
+        await database.DeleteItemByIDAsync(id);
+        FinancialOperationItems.RemoveAll(x => x.ID == id);
+        StateHasChanged();
+    }
+
+    async public void editRow(int id)
+    {
+        AddEditService.Edit = true;
+        AddEditService.id = id;
+        NavigationManager.NavigateTo($"/addedit");
+    }
+
+    public void SortList(ChangeEventArgs e)
+    {
+        switch(e.Value)
+        {
+            case "ByDateDescending":
+            {
+                FinancialOperationItems = FinancialOperationItems.OrderByDescending(x => x.Date).ToList();
+                break;
+            }
+            case "ByDateAscending":
+            {
+                FinancialOperationItems = FinancialOperationItems.OrderBy(x => x.Date).ToList();
+                break;
+            }
+            case "ByValueDescending":
+            {
+                FinancialOperationItems = FinancialOperationItems.OrderByDescending(x => x.Amount).ToList();
+                break;
+            }
+            case "ByValueAscending":
+            {
+                FinancialOperationItems = FinancialOperationItems.OrderBy(x => x.Amount).ToList();
+                break;
+            }
+        }
+        StateHasChanged();
+    }
+}

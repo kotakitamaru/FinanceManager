@@ -1,0 +1,112 @@
+﻿@page "/addedit"
+@using Finance_Manager.Data
+@inject IJSRuntime JSRuntime
+
+<label>@error</label>
+<div id="mainContainer" style="text-align:center; padding-top: 10%;">
+    <div id="addLabelContainer" style="padding-bottom: 30px; text-align:center;">
+        <label id="addLabel"  class="labelHryvnia" style="font-size: 30px;">@(AddEditService.Edit?"Edit":"Add")</label>
+        <label id="xdDebug"  class="labelHryvnia" style="font-size: 30px;"></label>
+    </div>
+     <div id="typeSelectContainer" style="padding-bottom: 40px; text-align:center;">
+         <select @bind=@Value id="typeSelect" class="inputType">
+             <option value="incomeType" selected>Income</option>
+             <option value="spendType">Spend</option>
+         </select>
+        <select id="typeSelect" class="inputType" style="margin-left: 5px" @bind=@type>
+            <option disabled selected value="">Type Choise</option>
+            @if(Value == "incomeType")
+            {
+                foreach (IncomeType incomeType in Enum.GetValues(typeof(IncomeType)))
+                {
+                    <option value="@incomeType">@incomeType</option>
+                }
+            }
+            else if(Value == "spendType")
+            {
+                foreach (SpendType spendType in Enum.GetValues(typeof(SpendType)))
+                {
+                    <option value="@spendType">@spendType</option>
+                }
+            }
+        </select>
+        </div>
+    <div id="amountInputContainer" style="padding-bottom: 30px; text-align:center;">
+        <input id="amountInput" @bind="@amount" class="inputAmount" type="number" placeholder="Amount" />
+    </div>
+    <div id="descriptionInputContainer" style="padding-bottom: 40px; text-align:center;">
+        <textarea id="descriptionInput"  class="inputDescription" type="text" placeholder="Description" @bind="@description"></textarea>
+    </div>
+
+    <div id="dateInputContainer" style="padding-bottom: 40px; text-align:center;">
+        <input id="dateInput" class="inputDate" type="date" @bind="@date"/>
+    </div>
+
+
+
+    <div id="buttonContainer" style="bottom: 50px; position: fixed; right: 20%">
+        <button id="cancelButton" class="AddEditButton" onclick="simulateBackButton()" style="margin-right: 60px;">Cancel</button>
+            <button id="okButton" class="AddEditButton"  @onclick="OnOKButtonClick">OK</button>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Arg { get; set; }
+    
+    decimal amount = 0m;
+    string type = "Other";
+    DateTime date = DateTime.Today;
+    string description;
+    public string Value = "incomeType";
+    private string error;
+    FinancialOperationsDatabase database = new FinancialOperationsDatabase();
+    
+    async public void OnOKButtonClick()
+    {
+        if (AddEditService.Edit == true)
+        {
+            FinancialOperationItem item = await database.GetItemAsync(AddEditService.id);
+            item.Amount = amount;
+            item.Type = type;
+            item.OperationType = (Value == "incomeType");
+            item.Date = date;
+            item.Description = description;
+            await database.UpdateItemAsync(item);
+        }
+        else
+        {
+            await database.SaveItemAsync(new FinancialOperationItem
+            {
+                Amount = amount,
+                Type = type,
+                OperationType = (Value == "incomeType"),
+                Date = date,
+                Description = description
+            });
+        }
+        await JSRuntime.InvokeVoidAsync("simulateBackButton");
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (AddEditService.Edit == true) 
+            {
+                var item = await database.GetItemAsync(AddEditService.id);
+                Value = item.OperationType ? "incomeType" : "spendType";
+                amount = item.Amount;
+                type = item.Type;
+                date = item.Date;
+                description = item.Description;
+                StateHasChanged();
+            }
+        }
+        catch(Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}
