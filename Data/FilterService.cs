@@ -6,4 +6,5 @@ public static class FilterService
     public static string Type { get; set; }
     public static DateTime firstDate { get; set; }
     public static DateTime lastDate { get; set; }
+    public static bool UseDateFilter { get; set; }
 }

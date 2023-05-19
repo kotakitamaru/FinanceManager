@@ -2,7 +2,7 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: #323539;
+    background-color: #bfcaa8;
     color: #EBEBEB;
 }
 
@@ -93,49 +93,48 @@ a, .btn-link {
     position: fixed;
     right: 30px;
     bottom: 30px;
+    background-color: #707c68;
 }
 
 .inputAmount {
     height: 45px;
-    width:50%;
-
-    display:inline-block;
-    text-align:center;
-    background-color: transparent;
-    border:none;
-    outline:none;
-    border-bottom: 1px solid white;
-    font-size:23px;
+    width: 50%;
+    display: inline-block;
+    text-align: center;
+    background-color: #abb595;
+    border: none;
+    outline: none;
+    border-radius:12px;
+    font-size: 23px;
     max-width: 48%;
     color: #EBEBEB;
 }
 
 .inputType {
-    height: auto;
+    height: 40px;
     width: auto;
     display: inline-block;
-
     text-align: center;
-    background-color: transparent;
+    background-color: #abb595;
     border: none;
     outline: none;
-    border-bottom: 1px solid white;
+    border-radius: 12px;
     font-size: 23px;
     color: #EBEBEB;
 }
 
 .inputDate {
-    height: auto;
-    width: 53%;
+    height: 33px;
+    width: 50%;
     display: inline-block;
-
     text-align: center;
-    background-color: transparent;
-    border: none;
+    background-color: #abb595;
+    border: 2px #f3f7e8;
+    border-radius: 12px;
+    text-align: center;
     outline: none;
-    border-bottom: 1px solid white;
     font-size: 23px;
-    color: #EBEBEB;
+    color: #ebebeb;
 }
 
 .inputDescription {
@@ -146,8 +145,9 @@ a, .btn-link {
     align-items: center;
     text-align: center;
     background-color: transparent;
-    border: 1px solid white;
-    border-radius: 10px;
+    background-color: #abb595;
+    border: none;
+    border-radius: 12px;
     outline: none;
     font-size: 23px;
     color: #EBEBEB;
@@ -158,5 +158,5 @@ a, .btn-link {
     width: 80px;
     border-radius: 12px;
     height: 45px;
-
+    background-color: #707c68;
 }

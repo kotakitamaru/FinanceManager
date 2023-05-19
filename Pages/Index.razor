@@ -1,12 +1,14 @@
 ﻿@page "/"
 @using Finance_Manager.Data
+@inject NavigationManager NavigationManager
 <lable>@error</lable>
-<div>
-    <input class="inputDate" style="width: 45%" @bind="@firstDate" max="@lastDate.ToString("yyyy-MM-dd")" type="date"/> - 
-    <input class="inputDate" style="width: 45%" @bind="@lastDate" type="date"/>
-    <input type="checkbox"/>
+<div style="left: 5px;">
+    <input class="inputDate" style="width: 43%;" @bind="@firstDate" max="@lastDate.ToString("yyyy-MM-dd")" type="date" />
+    <label style="font-size: 30px;"> - </label>
+    <input class="inputDate" style="width: 43%" @bind="@lastDate" type="date"/>
+    <input type="checkbox" class="checkBox" @bind="@UseDateFilter" style="border-radius: 30px;"/>
 </div>
-<div style="padding-top: 10%;">
+<div class="divBalance">
     <div class="Balance">
         <label>Balance</label>
     </div>
@@ -33,11 +35,13 @@
             </td>
         </tr>
     </table>
-
+    
+    @*#707c68*@
+    @*#343932*@
     <div class="Div2">
-        <button class="@(isIncomeActive?"btn btn-info":"btn btn-light ")" style="width: 49%;" @onclick="OnClickIncome">Income</button>
-        <button class="@(isIncomeActive?"btn btn-light ":"btn btn-info")" style="width: 49%;" @onclick="OnClickSpends">Spends</button>
-        <ul class="list-group">
+        <button class="@(isIncomeActive?"btn btn-info":"btn btn-light ")" style="@(isIncomeActive? "background-color: #707c68; width: 49%; color: #ebebeb; ":"background-color: #343932; width: 49%; color: #ebebeb;")" @onclick="OnClickIncome">Income</button>
+        <button class="@(isIncomeActive?"btn btn-light ":"btn btn-info")" style="@(isIncomeActive? "background-color: #343932; width: 49%;  color: #ebebeb;":"background-color: #707c68; width: 49%;  color: #ebebeb;")" @onclick="OnClickSpends">Spends</button>
+        <ul class="list-group" style="padding-top: 20px; border-radius: 12px; ">
             @{
                 if (incomeList == null || spendsList == null)
                 {
@@ -46,14 +50,14 @@
                 else
                 {
                     foreach (var item in isIncomeActive?
-                        incomeList.Where(x=>x.Date <= lastDate && x.Date >= firstDate)
+                        incomeList.Where(x=>x.Date <= lastDate && x.Date >= firstDate || !UseDateFilter)
                             .GroupBy(x => x.Type)
                             .OrderByDescending(x=>x.Sum(x=>x.Amount)):
-                        spendsList.Where(x=>x.Date <= lastDate && x.Date >= firstDate)
+                        spendsList.Where(x=>x.Date <= lastDate && x.Date >= firstDate || !UseDateFilter)
                             .GroupBy(x => x.Type)
                             .OrderByDescending(x=>x.Sum(x=>x.Amount)))
                     {
-                        <li class="list-group-item list-group-item list-group-item-action">
+                        <li class="list-group-item list-group-item list-group-item-action" style="color: #ebebeb; background-color: #abb595; border: none;" @onclick="() => OnClickListItem(item.Key,isIncomeActive)">
                             @item.Key
                             <label style="position: absolute;right: 5px">@item.Sum(x => x.Amount)</label>
                         </li>
@@ -66,12 +70,23 @@
 
 @code
 {
+    bool isIncomeActive = true;
     FinancialOperationsDatabase database= new FinancialOperationsDatabase();
     decimal balance;
     decimal income;
     decimal spends;
     string error;
-    bool isIncomeActive = true;
+    bool _useDateFilter  = true;
+    bool UseDateFilter
+    {
+        get { return _useDateFilter;}
+        set
+        {
+            _useDateFilter = value;
+            OnChackBoxChange();
+        }
+    }
+
     List<FinancialOperationItem> incomeList; 
     List<FinancialOperationItem> spendsList;
     DateTime firstDate;
@@ -80,13 +95,15 @@
     {
         try
         {
-            income = (await database.GetIncome()).Sum(x => x.Amount);
-            spends = (await database.GetSpends()).Sum(x => x.Amount);
+            lastDate = DateTime.Today;
+            firstDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            income = (await database.GetIncome()).Where(x=>x.Date <= lastDate && x.Date >= firstDate || !UseDateFilter)
+                .Sum(x => x.Amount);
+            spends = (await database.GetSpends()).Where(x=>x.Date <= lastDate && x.Date >= firstDate || !UseDateFilter)
+                .Sum(x => x.Amount);
             balance = income - spends;
             incomeList = await database.GetIncome();
             spendsList = await database.GetSpends();
-            lastDate = DateTime.Today;
-            firstDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             StateHasChanged();
         }
         catch (Exception ex)
@@ -112,6 +129,20 @@
     {
         FilterService.Type = type;
         FilterService.OperationType = opType;
-        
+        FilterService.firstDate = firstDate;
+        FilterService.lastDate = lastDate;
+        FilterService.UseDateFilter = UseDateFilter;
+        NavigationManager.NavigateTo("/FiltredByType");
     }
+
+    async void OnChackBoxChange()
+    {
+        income = (await database.GetIncome()).Where(x => x.Date <= lastDate && x.Date >= firstDate || !UseDateFilter)
+            .Sum(x => x.Amount);
+        spends = (await database.GetSpends()).Where(x => x.Date <= lastDate && x.Date >= firstDate || !UseDateFilter)
+            .Sum(x => x.Amount);
+        balance = income - spends;
+        StateHasChanged();
+    }
+
 }

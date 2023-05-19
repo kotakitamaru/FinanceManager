@@ -25,4 +25,25 @@
 .Div2{
     padding-top: 15%;
     align-items: center;
+    color: #ebebeb;
+}
+
+input[type=checkbox].checkBox {
+    appearance: none;
+    height: 27px;
+    width: 27px;
+    border-radius: 50%;
+    background-color: #707c68;
+}
+
+input[type=checkbox].checkBox:checked{
+    background-color: #343932;
+}
+
+.divBalance {
+    padding-top: 10%;
+    align-content: center;
+    border-radius: 12px;
+    background-color: #abb595;
+    height: 220px;
 }

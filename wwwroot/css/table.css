@@ -1,20 +1,18 @@
 ﻿.historyTable {
     width: 100%;
-    border: none;
     text-align: center;
-
+    color: #EBEBEB;
+    background-color: #abb595;
+    border-radius: 12px;
 }
 
-.historyTableCell
-{
+.historyTableCell {
     height: 30px;
     vertical-align: center;
-
     color: white;
-    border: #323539;
+
     border-style: solid;
     text-align: center;
-    border-radius: 5px;
 }
 
 .DeleteEditButton

@@ -1,0 +1,55 @@
+﻿@page "/FiltredByType"
+@using Finance_Manager.Data
+<lable>@error</lable>
+<h1>@FilterService.Type</h1>
+<h3>@FilterService.firstDate.ToString("d MMMM yyyy") - @FilterService.lastDate.ToString("d MMMM yyyy")</h3>
+<ul class="list-group">
+    @{
+        if (incomeList == null || spendsList == null)
+        {
+            <Label>Loading...</Label>
+        }
+        else
+        {
+            foreach (var item in FilterService.OperationType ?
+                incomeList.Where(x => x.Date <= @FilterService.lastDate && x.Date >= FilterService.firstDate || !FilterService.UseDateFilter)
+                    .Where(x=>x.Type == FilterService.Type)
+                    .GroupBy(x => x.Date)
+                    .OrderByDescending(x=>x.Key):
+                spendsList.Where(x => x.Date <= @FilterService.lastDate && x.Date >= FilterService.firstDate || !FilterService.UseDateFilter)
+                    .Where(x=>x.Type == FilterService.Type)
+                    .GroupBy(x => x.Date)
+                    .OrderByDescending(x=>x.Key))
+            {
+                <label style="background-color: #828a71; border-radius:8px;">@item.Key.ToString("d MMMM yyyy")</label>
+                foreach (var operation in item)
+                {
+                    <li class="list-group-item list-group-item list-group-item-action" style="background-color: #abb595; border-radius: 10px;">
+                        <label style="width: 20%;">@(FilterService.OperationType ? "" : "-")@operation.Amount</label>
+                        <label style="margin-left: 10px;">@operation.Description</label>
+                    </li>
+                }
+            }
+        }
+    }
+</ul>
+
+@code {
+    string error;
+    List<FinancialOperationItem> incomeList; 
+    List<FinancialOperationItem> spendsList;
+    FinancialOperationsDatabase database = new FinancialOperationsDatabase();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            incomeList = await database.GetIncome();
+            spendsList = await database.GetSpends();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            error = "Помилка: " + ex.Message;
+        }
+    }
+}
